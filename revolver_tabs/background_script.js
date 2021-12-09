@@ -68,12 +68,19 @@ function moveTab(timerWindowId) {
 	var nextTabIndex = 0;
 	chrome.tabs.getSelected(timerWindowId, function(currentTab){
 		grabTabSettings(currentTab.windowId, currentTab, function(tabSetting){
-
+			chrome.tabs.getAllInWindow(timerWindowId, function(tabs) {
+				grabTabSettings(tabs[(currentTab.index + 2)%tabs.length].windowId, tabs[(currentTab.index + 2)%tabs.length], function(tabSetting2){
+					if(tabSetting2.reload && !include(settings.noRefreshList, tabs[(currentTab.index + 2)%tabs.length].url) && tabs[(currentTab.index + 2)%tabs.length].url.substring(0,19) != "chrome://extensions"){
+						chrome.tabs.reload(tabs[(currentTab.index + 2)%tabs.length].id);
+					}
+				});
+			});
 			if(tabSetting.reload && !include(settings.noRefreshList, currentTab.url) && currentTab.url.substring(0,19) != "chrome://extensions"){
 				chrome.tabs.reload(currentTab.id, switchToNextTab(timerWindowId, currentTab));
 			} else {
 				switchToNextTab(timerWindowId, currentTab)();
 			}
+			
 		});
 	});
 }
@@ -86,13 +93,8 @@ function switchToNextTab(timerWindowId, currentTab) {
 			} else {
 				nextTabIndex = 0;
 			}
-			if(nextTabIndex + 1 < tabs.length) {
-				nextTabIndex2 = nextTabIndex + 1;
-			} else {
-				nextTabIndex2 = 0;
-			}
 			activateTab(tabs[nextTabIndex]);
-			chrome.tabs.reload(nextTabIndex2);
+			
 
 		});
 	}
