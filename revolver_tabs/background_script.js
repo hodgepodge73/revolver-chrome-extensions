@@ -86,7 +86,14 @@ function switchToNextTab(timerWindowId, currentTab) {
 			} else {
 				nextTabIndex = 0;
 			}
+			if(nextTabIndex + 1 < tabs.length) {
+				nextTabIndex2 = nextTabIndex + 1;
+			} else {
+				nextTabIndex2 = 0;
+			}
 			activateTab(tabs[nextTabIndex]);
+			chrome.tabs.reload(nextTabIndex2);
+
 		});
 	}
 
